@@ -1,0 +1,7 @@
+{
+  "name": "VIP Prediction Dashboard",
+  "description": "A high-end Neubrutalist dashboard for VIP predictions and features, featuring real-time AI insights powered by Gemini.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

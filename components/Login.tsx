@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import useSound from '../hooks/useSound';
 
 const Login: React.FC = () => {
-    const { login, signup, loginWithGoogle, loginWithFacebook } = useAuth();
+    const { loginWithEmail, signupWithEmail, loginWithGoogle, loginWithFacebook } = useAuth();
     const { t } = useLanguage();
     const playClick = useSound();
     const [isLogin, setIsLogin] = useState(true);
@@ -18,12 +18,13 @@ const Login: React.FC = () => {
         setError('');
         try {
             if (isLogin) {
-                await login(email, password);
+                await loginWithEmail(email, password);
             } else {
-                await signup(email, password);
+                await signupWithEmail(email, password);
             }
-        } catch (err) {
-            setError('Operation failed. Please check your credentials.');
+        } catch (err: any) {
+            console.error('Email auth error:', err);
+            setError(err.message || 'Operation failed. Please check your credentials.');
         }
     };
 
@@ -75,7 +76,17 @@ const Login: React.FC = () => {
 
                 <div className="flex flex-col gap-3">
                     <button
-                        onClick={() => { playClick(); loginWithGoogle(); }}
+                        onClick={async () => {
+                            playClick();
+                            setError('');
+                            try {
+                                await loginWithGoogle();
+                            } catch (err: any) {
+                                console.error('Google login error:', err);
+                                setError('Google Sign-In failed: ' + (err.message || 'Unknown error'));
+                                alert('Google Sign-In failed: ' + (err.message || 'Unknown error. Check console.'));
+                            }
+                        }}
                         className="bg-white text-black p-4 rounded-lg font-black text-lg border-[3px] border-black relative shadow-neubrutalist-sm active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
                     >
                         <span className="absolute left-4">
@@ -84,7 +95,16 @@ const Login: React.FC = () => {
                         {t('google')}
                     </button>
                     <button
-                        onClick={() => { playClick(); loginWithFacebook(); }}
+                        onClick={async () => {
+                            playClick();
+                            setError('');
+                            try {
+                                await loginWithFacebook();
+                            } catch (err: any) {
+                                console.error('Facebook login error:', err);
+                                setError('Facebook Sign-In failed: ' + (err.message || 'Unknown error'));
+                            }
+                        }}
                         className="bg-[#1877F2] text-white p-4 rounded-lg font-black text-lg border-[3px] border-black relative shadow-neubrutalist-sm active:translate-y-1 active:shadow-none transition-all flex items-center justify-center"
                     >
                         <span className="absolute left-4">

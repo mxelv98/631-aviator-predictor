@@ -31,8 +31,6 @@ import VipManager from './components/admin/VipManager';
 import Predictions from './components/admin/Predictions';
 
 // Wrapper Components
-import MobileLayout from './components/mobile/MobileLayout';
-import DesktopLanding from './components/DesktopLanding'; // Keeping the import but effectively disabling it for now if user wants "Stay as is", OR maybe they want Landing for non-logged in?
 // Actually user said "PC stays as is" -> meaning old dashboard.
 // I will just use MainApp for PC.
 
@@ -41,20 +39,7 @@ import DesktopLanding from './components/DesktopLanding'; // Keeping the import 
 const HomeWrapper = () => {
   const { user } = useAuth();
   if (!user) return <Login />;
-
-  return (
-    <>
-      {/* MOBILE: New Design */}
-      <div className="block md:hidden w-full h-screen overflow-hidden">
-        <MobileLayout />
-      </div>
-
-      {/* DESKTOP: Original Dashboard */}
-      <div className="hidden md:flex flex-col w-full min-h-screen">
-        <MainApp />
-      </div>
-    </>
-  );
+  return <MainApp />;
 };
 
 const ProfileWrapper = () => {

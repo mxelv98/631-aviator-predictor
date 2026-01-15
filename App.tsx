@@ -164,7 +164,16 @@ const MainApp: React.FC = () => {
   if (!user) return <Login />;
 
   return (
-    <div className="flex-grow flex flex-col items-center justify-start pt-16 pb-12 px-4 md:px-6">
+    <div className="flex-grow flex flex-col items-center justify-start pt-8 pb-12 px-4 md:px-6">
+      <div className="w-full max-w-5xl mb-8">
+        <Header
+          onProfileClick={() => navigate('/profile')}
+          onVipClick={() => navigate('/vip')}
+          onSettingsClick={() => navigate('/settings')}
+          onAboutClick={() => navigate('/about')}
+        />
+      </div>
+
       <section className="text-center space-y-2 mb-10" data-purpose="title-section">
         <h1 className="text-6xl md:text-8xl font-black leading-none bg-gradient-to-r from-black via-gray-600 to-black bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto]">
           1631
@@ -246,25 +255,9 @@ const MainApp: React.FC = () => {
 // Internal component to handle Router context
 const AppContent: React.FC = () => {
   const { theme } = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const hideHeaderRoutes = ['/login', '/signup', '/forgot-password', '/update-password'];
-  const isAuthPage = hideHeaderRoutes.includes(location.pathname);
-  const isAdminPage = location.pathname.startsWith('/admin');
-
-  const shouldShowHeader = !isAuthPage && !isAdminPage;
 
   return (
     <div className={clsx('min-h-screen bg-gray-50 flex flex-col font-sans transition-colors duration-200', theme === 'dark' ? 'dark bg-gray-900' : '')}>
-      {shouldShowHeader && (
-        <Header
-          onProfileClick={() => navigate('/profile')}
-          onVipClick={() => navigate('/vip')}
-          onSettingsClick={() => navigate('/settings')}
-          onAboutClick={() => navigate('/about')}
-        />
-      )}
       <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl w-full relative z-10">
         <Routes>
           <Route path="/login" element={<Login />} />

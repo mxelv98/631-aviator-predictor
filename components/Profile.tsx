@@ -1,29 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useLanguage } from '../context/LanguageContext';
-import { supabase } from '../lib/supabase';
-import { languages } from '../lib/translations'; // Import languages
-import { Crown, Moon, Bell, Globe, LogOut, ArrowLeft, Loader2 } from 'lucide-react';
-
-interface ProfileProps {
-    onBack: () => void;
-}
-
-const getNumericId = (uid: string): string => {
-    let hash = 0;
-    for (let i = 0; i < uid.length; i++) {
-        hash = ((hash << 5) - hash) + uid.charCodeAt(i);
-        hash |= 0; // Ensure 32-bit integer
-    }
-    return Math.abs(hash).toString().substring(0, 8);
-};
+import { useTheme } from '../context/ThemeContext';
 
 const Profile: React.FC<ProfileProps> = ({ onBack }) => {
     const { user, logout } = useAuth();
     const { t, language, setLanguage } = useLanguage();
+    const { theme, toggleTheme } = useTheme();
 
     // Settings State
-    const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState(true);
     const [loadingSettings, setLoadingSettings] = useState(true);
 
@@ -34,6 +16,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
     const handleLogout = async () => {
         try {
             await logout();
+            onBack(); // Ensure simple navigation back after logout
         } catch (error) {
             console.error("Failed to logout", error);
         }
@@ -45,15 +28,6 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
             fetchVipStatus();
         }
     }, [user]);
-
-    // Apply Dark Mode
-    useEffect(() => {
-        if (darkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }, [darkMode]);
 
     // VIP Timer
     useEffect(() => {
@@ -71,9 +45,8 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
 
     const fetchSettings = async () => {
         if (!user) return;
-        const { data } = await supabase.from('user_settings').select('*').eq('user_id', user.id).single();
+        const { data } = await supabase.from('user_settings').select('notifications_enabled').eq('user_id', user.id).single();
         if (data) {
-            setDarkMode(data.dark_mode);
             setNotifications(data.notifications_enabled);
         }
         setLoadingSettings(false);
@@ -93,11 +66,19 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
         }
     };
 
-    const toggleDarkMode = async () => {
-        const newValue = !darkMode;
-        setDarkMode(newValue);
+    // toggleDarkMode is replaced by toggleTheme from context
+
+    const toggleNotifications = async () => {
+        const newValue = !notifications;
+        setNotifications(newValue);
         if (user) {
-            await supabase.from('user_settings').upsert({ user_id: user.id, dark_mode: newValue, notifications_enabled: notifications });
+            await supabase.from('user_settings').upsert({
+                user_id: user.id,
+                // dark_mode is handled by ThemeContext now, but we need to preserve it if we update here. 
+                // However, user_settings table probably has independent columns.
+                // Ideally, we should only update notifications here.
+                notifications_enabled: newValue
+            });
         }
     };
 
@@ -195,7 +176,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
                                 <span className="font-bold">Dark Mode</span>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" className="sr-only peer" checked={darkMode} onChange={toggleDarkMode} />
+                                <input type="checkbox" className="sr-only peer" checked={theme === 'dark'} onChange={toggleTheme} />
                                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black"></div>
                             </label>
                         </div>

@@ -256,7 +256,7 @@ const AppContent: React.FC = () => {
         onSettingsClick={() => navigate('/settings')}
         onAboutClick={() => navigate('/about')}
       />
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-md w-full relative z-10">
+      <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl w-full relative z-10">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

@@ -1,12 +1,11 @@
 
-import { GoogleGenAI, SchemaType } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
 // Use Vite environment variable
 const apiKey = import.meta.env.VITE_GOOGLE_API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+const genAI = new GoogleGenerativeAI(apiKey);
 
 export const getAiAnalysis = async (userPrompt: string, isVip: boolean) => {
-  const model = 'gemini-2.0-flash-exp'; // Updated model name if needed, keeping generic logic
   const version = isVip ? '1631 6v' : '1631 3v';
 
   const systemInstruction = `
@@ -21,16 +20,19 @@ export const getAiAnalysis = async (userPrompt: string, isVip: boolean) => {
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model,
-      contents: userPrompt,
-      config: {
-        systemInstruction,
-        temperature: 0.7,
-      },
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash', // Using stable model
+      systemInstruction,
     });
 
-    return response.text;
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+      }
+    });
+
+    return result.response.text();
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "HANDSHAKE_ERROR: Database unavailable. Retry connection.";
@@ -38,13 +40,10 @@ export const getAiAnalysis = async (userPrompt: string, isVip: boolean) => {
 };
 
 export const getVipPrediction = async () => {
-  const model = 'gemini-2.0-flash-exp';
-
   try {
-    const response = await ai.models.generateContent({
-      model,
-      contents: "Predict a realistic Aviator crash multiplier. Target range 1.5x - 8.5x. Provide multiplier, confidence, and 3-word reason.",
-      config: {
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      generationConfig: {
         responseMimeType: "application/json",
         responseSchema: {
           type: SchemaType.OBJECT,
@@ -67,7 +66,9 @@ export const getVipPrediction = async () => {
       },
     });
 
-    return JSON.parse(response.text || '{}');
+    const result = await model.generateContent("Predict a realistic Aviator crash multiplier. Target range 1.5x - 8.5x. Provide multiplier, confidence, and 3-word reason.");
+    return JSON.parse(result.response.text() || '{}');
+
   } catch (error) {
     console.error("Gemini Prediction Error:", error);
     return {

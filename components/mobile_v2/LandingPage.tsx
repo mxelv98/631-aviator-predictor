@@ -49,11 +49,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
 
     return (
         <div className="flex flex-col h-full bg-brand-bg text-slate-200">
-            <main className="flex-1 px-8 py-16 flex flex-col justify-center relative overflow-y-auto">
+            <main className="flex-1 px-8 py-16 flex flex-col items-center relative overflow-y-auto pb-24">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
 
                 {/* Logo Section */}
-                <div className="mb-14 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
+                <div className="mb-14 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700 w-full">
                     <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center font-black text-white text-xl shadow-lg shadow-brand-primary/20 italic">
                         1
                     </div>
@@ -64,7 +64,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
                 </div>
 
                 {/* Hero Section */}
-                <div className="mb-14 space-y-4 animate-in fade-in duration-1000 delay-100">
+                <div className="mb-14 space-y-4 animate-in fade-in duration-1000 delay-100 w-full">
                     <h1 className="text-6xl font-black tracking-tighter text-white leading-[0.85] uppercase italic">
                         {t.hero.split(' ')[0]} <br /><span className="text-brand-primary">{t.hero.split(' ')[1]}</span>
                     </h1>
@@ -74,7 +74,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
                 </div>
 
                 {/* Tier Cards */}
-                <div className="space-y-4 mb-14">
+                <div className="space-y-4 mb-14 w-full">
                     {/* 3v Card */}
                     <div className={`group p-6 rounded-[32px] border transition-all duration-500 ${!user.isVip ? 'border-brand-primary/30 bg-brand-primary/5 pro-shadow' : 'border-white/5 opacity-40 grayscale'}`}>
                         <div className="flex justify-between items-start mb-2">
@@ -120,9 +120,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
                 {/* Start Action */}
                 <button
                     onClick={onStart}
-                    className={`w-full py-7 rounded-[40px] font-black text-sm uppercase tracking-[0.5em] transition-all relative overflow-hidden flex items-center justify-center gap-4 group shadow-2xl active:scale-[0.98]
-            ${user.isVip ? 'bg-brand-elite text-black' : 'bg-white text-black hover:bg-brand-primary hover:text-white'}
-          `}
+                    style={{ backgroundColor: user.isVip ? '#f59e0b' : '#ffffff' }}
+                    className={`w-full py-7 rounded-[40px] font-black text-sm uppercase tracking-[0.5em] transition-all relative overflow-hidden flex items-center justify-center gap-4 group shadow-2xl active:scale-[0.98] text-black hover:scale-[1.01]`}
                 >
                     {t.init}
                     <svg className={`group-hover:translate-x-2 transition-transform ${isArabic ? 'rotate-180' : ''}`} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M5 12h14M12 5l7 7-7 7" /></svg>

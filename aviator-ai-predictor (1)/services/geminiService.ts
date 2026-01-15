@@ -1,14 +1,12 @@
 
-import { GoogleGenAI, SchemaType } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
-// Use Vite environment variable
-const apiKey = import.meta.env.VITE_GOOGLE_API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
 export const getAiAnalysis = async (userPrompt: string, isVip: boolean) => {
-  const model = 'gemini-2.0-flash-exp'; // Updated model name if needed, keeping generic logic
+  const model = 'gemini-3-flash-preview';
   const version = isVip ? '1631 6v' : '1631 3v';
-
+  
   const systemInstruction = `
     You are the "1631 Aviator AI Engine", currently running version ${version}.
     Version 3v (Standard) provides general market analysis.
@@ -38,8 +36,8 @@ export const getAiAnalysis = async (userPrompt: string, isVip: boolean) => {
 };
 
 export const getVipPrediction = async () => {
-  const model = 'gemini-2.0-flash-exp';
-
+  const model = 'gemini-3-flash-preview';
+  
   try {
     const response = await ai.models.generateContent({
       model,
@@ -47,18 +45,18 @@ export const getVipPrediction = async () => {
       config: {
         responseMimeType: "application/json",
         responseSchema: {
-          type: SchemaType.OBJECT,
+          type: Type.OBJECT,
           properties: {
             predictedMultiplier: {
-              type: SchemaType.NUMBER,
+              type: Type.NUMBER,
               description: "The predicted crash multiplier value",
             },
             confidence: {
-              type: SchemaType.NUMBER,
+              type: Type.NUMBER,
               description: "Confidence percentage (0-100)",
             },
             reasoning: {
-              type: SchemaType.STRING,
+              type: Type.STRING,
               description: "3-word explanation.",
             },
           },

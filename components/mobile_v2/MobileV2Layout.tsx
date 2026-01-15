@@ -1,0 +1,182 @@
+import React, { useState, useEffect } from 'react';
+import { AppState, User } from './types';
+import LandingPage from './LandingPage';
+import VipDashboard from './VipDashboard';
+import AiChat from './AiChat';
+import AccountPage from './AccountPage';
+import LoginPage from './LoginPage';
+import AboutUs from './AboutUs';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
+
+const MobileV2Layout: React.FC = () => {
+    const { user: authUser, loginWithEmail, loginWithGoogle, logout } = useAuth();
+    const [currentPage, setCurrentPage] = useState<AppState>(AppState.LOGIN);
+    const [user, setUser] = useState<User | null>(null);
+
+    const isRTL = user?.language === 'العربية';
+
+    // Sync remote auth state to local User state
+    useEffect(() => {
+        if (!authUser) {
+            setUser(null);
+            // Only redirect to login if we are not already there
+            if (currentPage !== AppState.LOGIN) {
+                setCurrentPage(AppState.LOGIN);
+            }
+            return;
+        }
+
+        const syncUserData = async () => {
+            // Check VIP status
+            const { data: vipData } = await supabase
+                .from('vip_subscriptions')
+                .select('*')
+                .eq('user_id', authUser.id)
+                .eq('status', 'active')
+                .gt('end_time', new Date().toISOString())
+                .maybeSingle();
+
+            const isVip = !!vipData;
+            // Basic scans count tracking via local storage for now
+            const scansCount = parseInt(localStorage.getItem('aviator_scans_count') || '0', 10);
+            const language = localStorage.getItem('aviator_language') || 'English';
+
+            const newUser: User = {
+                id: authUser.id,
+                username: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
+                email: authUser.email,
+                isVip: isVip,
+                isV3Paid: isVip, // Assuming active VIP grants access to paid features
+                scansCount: scansCount,
+                version: isVip ? '1631 6v' : '1631 3v',
+                language: language
+            };
+
+            setUser(newUser);
+
+            // If we're on Login page but have a user, go to Landing
+            if (currentPage === AppState.LOGIN) {
+                setCurrentPage(AppState.LANDING);
+            }
+        };
+
+        syncUserData();
+    }, [authUser]);
+
+    const handleLogin = async (email: string, password: string) => {
+        await loginWithEmail(email, password);
+    };
+
+    const handleGoogleLogin = async () => {
+        await loginWithGoogle();
+    };
+
+    const handleLogout = async () => {
+        await logout();
+        setUser(null);
+        setCurrentPage(AppState.LOGIN);
+    };
+
+    const handleUpgradeV3 = () => {
+        // Redirect to VIP page or handle upgrade logic
+        // For now, maybe just open the VIP modal or navigate?
+        // In the original app, it navigates to /vip
+        // This acts as a placeholder or can link to the main app's payment flow
+        window.location.href = '/vip'; // Simple redirect to existing payment flow
+    };
+
+    const handleUpgradeV6 = () => {
+        window.location.href = '/vip';
+    };
+
+    const incrementScan = () => {
+        if (user) {
+            const newCount = user.scansCount + 1;
+            const updatedUser = { ...user, scansCount: newCount };
+            setUser(updatedUser);
+            localStorage.setItem('aviator_scans_count', newCount.toString());
+        }
+    };
+
+    const handleUpdateLanguage = (lang: string) => {
+        if (user) {
+            const updatedUser = { ...user, language: lang };
+            setUser(updatedUser);
+            localStorage.setItem('aviator_language', lang);
+        }
+    };
+
+    const renderPage = () => {
+        if (!user && currentPage !== AppState.LOGIN) {
+            return <LoginPage onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />;
+        }
+
+        switch (currentPage) {
+            case AppState.LOGIN:
+                return <LoginPage onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />;
+            case AppState.LANDING:
+                return user ? (
+                    <LandingPage
+                        user={user}
+                        onUpgradeV3={handleUpgradeV3}
+                        onUpgradeV6={handleUpgradeV6}
+                        onOpenChat={() => setCurrentPage(AppState.AI_CHAT)}
+                        onOpenAccount={() => setCurrentPage(AppState.ACCOUNT)}
+                        onOpenAbout={() => setCurrentPage(AppState.ABOUT)}
+                        onStart={() => setCurrentPage(AppState.VIP_DASHBOARD)}
+                    />
+                ) : null;
+            case AppState.VIP_DASHBOARD:
+                return user ? (
+                    <VipDashboard
+                        user={user}
+                        onScanPerformed={incrementScan}
+                        onUpgradeV3={handleUpgradeV3}
+                        onUpgradeV6={handleUpgradeV6}
+                        onBack={() => setCurrentPage(AppState.LANDING)}
+                        onOpenChat={() => setCurrentPage(AppState.AI_CHAT)}
+                        onOpenAccount={() => setCurrentPage(AppState.ACCOUNT)}
+                    />
+                ) : null;
+            case AppState.AI_CHAT:
+                return user ? (
+                    <AiChat
+                        user={user}
+                        onBack={() => setCurrentPage(AppState.VIP_DASHBOARD)}
+                    />
+                ) : null;
+            case AppState.ACCOUNT:
+                return user ? (
+                    <AccountPage
+                        user={user}
+                        onBack={() => setCurrentPage(AppState.LANDING)}
+                        onUpgradeV3={handleUpgradeV3}
+                        onUpgradeV6={handleUpgradeV6}
+                        onOpenAbout={() => setCurrentPage(AppState.ABOUT)}
+                        onLogout={handleLogout}
+                        onLanguageChange={handleUpdateLanguage}
+                    />
+                ) : null;
+            case AppState.ABOUT:
+                return user ? (
+                    <AboutUs
+                        user={user}
+                        onBack={() => setCurrentPage(AppState.ACCOUNT)}
+                    />
+                ) : null;
+            default:
+                return <LoginPage onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />;
+        }
+    };
+
+    return (
+        <div className="min-h-screen flex justify-center bg-[#000000] sm:p-6" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="w-full max-w-[480px] bg-brand-bg min-h-[100dvh] sm:min-h-0 sm:h-[840px] relative overflow-hidden flex flex-col sm:rounded-[40px] sm:shadow-2xl sm:border border-brand-border">
+                {renderPage()}
+            </div>
+        </div>
+    );
+};
+
+export default MobileV2Layout;

@@ -39,7 +39,7 @@ const MobileV2Layout: React.FC = () => {
         const isVip = !!vipData;
 
         // Access plan_type safely
-        const planType = (vipData as any)?.plan_type || 'core_v3';
+        const planType = (vipData as any)?.plan_type || 'elite_v6';
         const isElite = isVip && planType === 'elite_v6';
 
         const scansCount = parseInt(localStorage.getItem('aviator_scans_count') || '0', 10);

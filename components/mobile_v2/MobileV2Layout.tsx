@@ -18,57 +18,79 @@ const MobileV2Layout: React.FC = () => {
     const isRTL = user?.language === 'العربية';
 
     // Sync remote auth state to local User state
-    useEffect(() => {
+    const syncUserData = async () => {
         if (!authUser) {
             setUser(null);
-            // Only redirect to login if we are not already there
             if (currentPage !== AppState.LOGIN) {
                 setCurrentPage(AppState.LOGIN);
             }
             return;
         }
 
-        const syncUserData = async () => {
-            // Check VIP status
-            const { data: vipData, error } = await supabase
-                .from('vip_subscriptions')
-                .select('*')
-                .eq('user_id', authUser.id)
-                .eq('status', 'active')
-                .gt('end_time', new Date().toISOString())
-                .maybeSingle();
+        // Check VIP status
+        const { data: vipData } = await supabase
+            .from('vip_subscriptions')
+            .select('*')
+            .eq('user_id', authUser.id)
+            .eq('status', 'active')
+            .gt('end_time', new Date().toISOString())
+            .maybeSingle();
 
-            const isVip = !!vipData;
-            // Access plan_type safely (even if TS complains about column existence without generated types)
-            const planType = (vipData as any)?.plan_type || 'core_v3';
-            const isElite = isVip && planType === 'elite_v6';
+        const isVip = !!vipData;
 
-            // Basic scans count tracking via local storage for now
-            const scansCount = parseInt(localStorage.getItem('aviator_scans_count') || '0', 10);
-            const language = localStorage.getItem('aviator_language') || 'English';
+        // Access plan_type safely
+        const planType = (vipData as any)?.plan_type || 'core_v3';
+        const isElite = isVip && planType === 'elite_v6';
 
-            const newUser: User = {
-                id: authUser.id,
-                username: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
-                email: authUser.email,
-                isVip: isVip,
-                isV3Paid: isVip, // Assuming active VIP grants access to paid features
-                scansCount: scansCount,
-                version: isElite ? '1631 6v' : '1631 3v',
-                language: language,
-                vipExpiry: vipData?.end_time,
-                planType: planType
-            };
+        const scansCount = parseInt(localStorage.getItem('aviator_scans_count') || '0', 10);
+        const language = localStorage.getItem('aviator_language') || 'English';
 
-            setUser(newUser);
-
-            // If we're on Login page but have a user, go to Landing
-            if (currentPage === AppState.LOGIN) {
-                setCurrentPage(AppState.LANDING);
-            }
+        const newUser: User = {
+            id: authUser.id,
+            username: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
+            email: authUser.email,
+            isVip: isVip,
+            isV3Paid: isVip,
+            scansCount: scansCount,
+            version: isElite ? '1631 6v' : '1631 3v',
+            language: language,
+            vipExpiry: vipData?.end_time,
+            planType: planType
         };
 
+        setUser(newUser);
+
+        // If we're on Login page but have a user, go to Landing
+        if (currentPage === AppState.LOGIN) {
+            setCurrentPage(AppState.LANDING);
+        }
+    };
+
+    useEffect(() => {
+        if (!authUser) return;
+
         syncUserData();
+
+        // Subscribe to Realtime Updates for VIP status
+        const channel = supabase
+            .channel('vip_updates')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'vip_subscriptions',
+                    filter: `user_id=eq.${authUser.id}`,
+                },
+                () => {
+                    syncUserData();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [authUser]);
 
     const handleLogin = async (email: string, password: string) => {

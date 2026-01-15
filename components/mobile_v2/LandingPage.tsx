@@ -49,7 +49,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
 
     return (
         <div className="flex flex-col h-full bg-brand-bg text-slate-200">
-            <main className="flex-1 px-8 py-16 flex flex-col justify-center relative">
+            <main className="flex-1 px-8 py-16 flex flex-col justify-center relative overflow-y-auto">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
 
                 {/* Logo Section */}

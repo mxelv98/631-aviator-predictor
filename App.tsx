@@ -5,19 +5,18 @@ import { Crown } from 'lucide-react';
 import Header from './components/Header';
 import PredictorCard from './components/PredictorCard';
 import { AppStatus } from './types';
-import clsx from 'clsx'; // Fixed import
+import clsx from 'clsx';
 
 import { useAuth } from './context/AuthContext';
 import Login from './components/Login';
-import Signup from './components/Signup'; // Fixed import
+import Signup from './components/Signup';
 import ForgotPassword from './components/ForgotPassword';
 import UpdatePassword from './components/UpdatePassword';
 import Profile from './components/Profile';
 import VIP from './components/VIP';
-// import Settings from './components/Settings'; // Removed as per previous tasks
 import AboutUs from './components/AboutUs';
 import { useLanguage } from './context/LanguageContext';
-import { useTheme } from './context/ThemeContext'; // Fixed import
+import { useTheme } from './context/ThemeContext';
 import useSound from './hooks/useSound';
 import Notifications from './components/Notifications';
 import VipAccessModal from './components/VipAccessModal';
@@ -244,43 +243,56 @@ const MainApp: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+// Internal component to handle Router context
+const AppContent: React.FC = () => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   return (
+    <div className={clsx('min-h-screen bg-gray-50 flex flex-col font-sans transition-colors duration-200', theme === 'dark' ? 'dark bg-gray-900' : '')}>
+      <Header
+        onProfileClick={() => navigate('/profile')}
+        onVipClick={() => navigate('/vip')}
+        onSettingsClick={() => navigate('/settings')}
+        onAboutClick={() => navigate('/about')}
+      />
+      <main className="flex-1 container mx-auto px-4 py-8 max-w-md w-full relative z-10">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/" element={<HomeWrapper />} />
+          <Route path="/vip" element={<VIPWrapper />} />
+          <Route path="/profile" element={<ProfileWrapper />} />
+          <Route path="/about" element={<AboutWrapper />} />
+          <Route path="/settings" element={<Navigate to="/profile" replace />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="users" element={<UserList />} />
+            <Route path="vip" element={<VipManager />} />
+            <Route path="payments" element={<Payments />} />
+            <Route path="predictions" element={<Predictions />} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+const App: React.FC = () => {
+  return (
     <Router>
-      <div className={clsx('min-h-screen bg-gray-50 flex flex-col font-sans transition-colors duration-200', theme === 'dark' ? 'dark bg-gray-900' : '')}>
-        <Header />
-        <main className="flex-1 container mx-auto px-4 py-8 max-w-md w-full relative z-10">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/update-password" element={<UpdatePassword />} />
-            <Route path="/" element={<HomeWrapper />} />
-            <Route path="/vip" element={<VIPWrapper />} />
-            <Route path="/profile" element={<ProfileWrapper />} />
-            <Route path="/about" element={<AboutWrapper />} />
-            <Route path="/settings" element={<Navigate to="/profile" replace />} />
-
-            {/* Admin Routes */}
-            <Route path="/admin" element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            }>
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="users" element={<UserList />} />
-              <Route path="vip" element={<VipManager />} />
-              <Route path="payments" element={<Payments />} />
-              <Route path="predictions" element={<Predictions />} />
-            </Route>
-
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
-      </div>
+      <AppContent />
     </Router>
   );
 };

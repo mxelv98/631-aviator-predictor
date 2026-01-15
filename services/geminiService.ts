@@ -78,3 +78,32 @@ export const getVipPrediction = async () => {
     };
   }
 };
+
+export const chatWithSupport = async (history: any[]) => {
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: "You are a helpful customer support assistant for the 1631 Aviator Predictor service. You help users with account issues, payment questions, and explain how the predictor works. Keep answers concise."
+    });
+
+    // Separate the last message (current question) from history
+    // AIAgent pushes the new user message to history before calling this.
+    const previousHistory = history.slice(0, -1);
+    const lastMessage = history[history.length - 1];
+
+    const chat = model.startChat({
+      history: previousHistory,
+    });
+
+    // Check if lastMessage has parts, extract text
+    const text = lastMessage?.parts?.[0]?.text || '';
+
+    if (!text) return "Error: No input text provided.";
+
+    const result = await chat.sendMessage(text);
+    return result.response.text();
+  } catch (error) {
+    console.error("Chat Error:", error);
+    throw error;
+  }
+};

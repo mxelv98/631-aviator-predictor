@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from './types';
 import { getAiAnalysis } from '../../services/geminiService';

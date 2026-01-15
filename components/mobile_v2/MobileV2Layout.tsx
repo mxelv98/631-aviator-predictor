@@ -38,8 +38,27 @@ const MobileV2Layout: React.FC = () => {
 
         const isVip = !!vipData;
 
-        // Access plan_type safely
-        const planType = (vipData as any)?.plan_type || 'elite_v6';
+        // Determine Plan Type based on Duration or explicit column
+        let planType = (vipData as any)?.plan_type;
+
+        if (!planType && vipData?.end_time && vipData?.created_at) {
+            // Infer from duration
+            const start = new Date(vipData.start_time || vipData.created_at).getTime();
+            const end = new Date(vipData.end_time).getTime();
+            const durationHours = (end - start) / (1000 * 60 * 60);
+
+            // If duration is short (e.g. 30 mins to 1 hour), assume Elite.
+            // If duration is long (e.g. > 12 hours), assume Core.
+            planType = durationHours < 12 ? 'elite_v6' : 'core_v3';
+        }
+
+        // Default to Elite if strictly unknown, OR Core? User complained about "Change everything" when I forced Elite.
+        // User screenshot shows Standard (Blue).
+        // Safest: If unknown, maybe Standard to avoid "changing everything"?
+        // But user asked for Elite earlier.
+        // I will trust the duration logic. If duration is NaN or invalid, default to 'elite_v6' to be generous.
+        if (!planType) planType = 'elite_v6';
+
         const isElite = isVip && planType === 'elite_v6';
 
         const scansCount = parseInt(localStorage.getItem('aviator_scans_count') || '0', 10);

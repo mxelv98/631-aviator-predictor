@@ -11,6 +11,7 @@ interface MessageModalProps {
 
 const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, recipientId, recipientName }) => {
     const [message, setMessage] = useState('');
+    const [sendViaEmail, setSendViaEmail] = useState(false);
     const [sending, setSending] = useState(false);
 
     if (!isOpen) return null;
@@ -19,30 +20,48 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, recipientI
         if (!message.trim()) return;
         setSending(true);
 
-        const { error } = await supabase
-            .from('admin_messages')
-            .insert({
-                sender_id: (await supabase.auth.getUser()).data.user?.id,
-                receiver_id: recipientId || null, // null for broadcast
-                message: message.trim(),
-                is_read: false
-            });
+        try {
+            // 1. Send In-App Message (Always)
+            const { error: dbError } = await supabase
+                .from('admin_messages')
+                .insert({
+                    sender_id: (await supabase.auth.getUser()).data.user?.id,
+                    receiver_id: recipientId || null, // null for broadcast
+                    message: message.trim(),
+                    is_read: false
+                });
 
-        setSending(false);
+            if (dbError) throw dbError;
 
-        if (error) {
-            console.error('Error sending message:', error);
-            alert('Failed to send message.');
-        } else {
+            // 2. Send Email (Optional)
+            if (sendViaEmail) {
+                const { error: funcError } = await supabase.functions.invoke('send-broadcast', {
+                    body: {
+                        subject: "Important Message from 1631 Admin",
+                        message: message.trim(),
+                        recipient_ids: recipientId ? recipientId : 'all'
+                    }
+                });
+                if (funcError) console.error("Edge Function Error:", funcError);
+            }
+
             // Log action
             await supabase.from('admin_logs').insert({
                 admin_id: (await supabase.auth.getUser()).data.user?.id,
-                action: 'SEND_MESSAGE',
+                action: sendViaEmail ? 'SEND_MESSAGE_EMAIL' : 'SEND_MESSAGE',
                 details: { recipient: recipientId || 'broadcast', message_preview: message.slice(0, 20) }
             });
+
             alert('Message sent successfully!');
             setMessage('');
+            setSendViaEmail(false);
             onClose();
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Failed to send message.');
+        } finally {
+            setSending(false);
         }
     };
 
@@ -72,6 +91,18 @@ const MessageModal: React.FC<MessageModalProps> = ({ isOpen, onClose, recipientI
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                     ></textarea>
+
+                    <div className="mt-4 flex items-center">
+                        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700 select-none">
+                            <input
+                                type="checkbox"
+                                className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black/20"
+                                checked={sendViaEmail}
+                                onChange={(e) => setSendViaEmail(e.target.checked)}
+                            />
+                            Send copy via Email (Resend)
+                        </label>
+                    </div>
 
                     <div className="mt-6 flex justify-end gap-3">
                         <button

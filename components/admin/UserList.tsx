@@ -13,6 +13,14 @@ const UserList: React.FC = () => {
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<{ id: string, name?: string } | null>(null);
 
+    // Live Timer State
+    const [now, setNow] = useState(new Date());
+
+    useEffect(() => {
+        const interval = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(interval);
+    }, []);
+
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -150,7 +158,24 @@ const UserList: React.FC = () => {
                             <tr><td colSpan={4} className="px-6 py-8 text-center text-gray-500">No users found.</td></tr>
                         ) : (
                             filteredUsers.map((user) => {
-                                const activeVip = user.vip_subscriptions?.find((v: any) => v.status === 'active' && new Date(v.end_time) > new Date());
+                                const activeVip = user.vip_subscriptions?.find((v: any) => v.status === 'active' && new Date(v.end_time) > now);
+
+                                let timerDisplay = null;
+                                let timerColor = "bg-gray-50 text-gray-500 border-gray-100";
+
+                                if (activeVip) {
+                                    const end = new Date(activeVip.end_time);
+                                    const diff = end.getTime() - now.getTime();
+                                    const minutes = Math.floor(diff / 60000);
+                                    const seconds = Math.floor((diff % 60000) / 1000);
+
+                                    timerDisplay = `${minutes}m ${seconds}s`; // Format: 5m 30s
+
+                                    if (minutes > 10) timerColor = "bg-green-50 text-green-700 border-green-200";
+                                    else if (minutes > 2) timerColor = "bg-yellow-50 text-yellow-700 border-yellow-200";
+                                    else timerColor = "bg-red-50 text-red-700 border-red-200 animate-pulse";
+                                }
+
                                 return (
                                     <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="px-6 py-4">
@@ -181,9 +206,9 @@ const UserList: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             {activeVip ? (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
-                                                    <Crown size={12} />
-                                                    VIP {format(new Date(activeVip.end_time), 'HH:mm')}
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${timerColor}`}>
+                                                    <Crown size={12} className="mb-0.5" />
+                                                    {timerDisplay}
                                                 </span>
                                             ) : (
                                                 <span className="text-xs text-gray-400">Inactive</span>

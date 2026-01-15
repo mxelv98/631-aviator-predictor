@@ -77,6 +77,11 @@ const Login: React.FC = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    <div className="flex justify-end -mt-3"> {/* Added -mt-3 to reduce gap */}
+                        <Link to="/forgot-password" className="text-sm font-semibold text-gray-500 hover:text-black">
+                            {t('forgotPassword') || 'Forgot Password?'}
+                        </Link>
+                    </div>
                     <button
                         type="submit"
                         className="bg-black text-white p-4 rounded-lg font-black text-xl shadow-neubrutalist hover:-translate-y-1 active:shadow-none active:translate-y-0 transition-all border-[3px] border-black"

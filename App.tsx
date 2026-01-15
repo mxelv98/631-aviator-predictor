@@ -1,20 +1,26 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { Crown } from 'lucide-react';
 import Header from './components/Header';
 import PredictorCard from './components/PredictorCard';
 import { AppStatus } from './types';
+import clsx from 'clsx'; // Fixed import
 
 import { useAuth } from './context/AuthContext';
 import Login from './components/Login';
+import Signup from './components/Signup'; // Fixed import
+import ForgotPassword from './components/ForgotPassword';
+import UpdatePassword from './components/UpdatePassword';
 import Profile from './components/Profile';
 import VIP from './components/VIP';
-import Settings from './components/Settings';
+// import Settings from './components/Settings'; // Removed as per previous tasks
 import AboutUs from './components/AboutUs';
 import { useLanguage } from './context/LanguageContext';
+import { useTheme } from './context/ThemeContext'; // Fixed import
 import useSound from './hooks/useSound';
 import Notifications from './components/Notifications';
+import VipAccessModal from './components/VipAccessModal';
 
 // Admin Imports
 import AdminRoute from './components/AdminRoute';
@@ -24,12 +30,34 @@ import UserList from './components/admin/UserList';
 import Payments from './components/admin/Payments';
 import VipManager from './components/admin/VipManager';
 import Predictions from './components/admin/Predictions';
-import Placeholder from './components/admin/Placeholder';
 
-// MainApp Component Logic Update already includes imports at top level.
-// Removing duplicate supabase import inside MainApp or near top.
-// The previous edit added it at line 3 AND line 30?
-// I will remove the one at line 30.
+// Wrapper Components
+const HomeWrapper = () => {
+  const { user } = useAuth();
+  if (!user) return <Login />;
+  return <MainApp />;
+};
+
+const ProfileWrapper = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  if (!user) return <Login />;
+  return <Profile onBack={() => navigate('/')} />;
+};
+
+const VIPWrapper = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  if (!user) return <Login />;
+  return <VIP onBack={() => navigate('/')} />;
+};
+
+const AboutWrapper = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  if (!user) return <Login />;
+  return <AboutUs onBack={() => navigate('/')} />;
+};
 
 const MainApp: React.FC = () => {
   const { user, loading } = useAuth();
@@ -44,6 +72,8 @@ const MainApp: React.FC = () => {
   // VIP State
   const [isVip, setIsVip] = React.useState(false);
   const [vipExpiry, setVipExpiry] = React.useState<Date | null>(null);
+  const [showVipModal, setShowVipModal] = React.useState(false);
+  const [vipTimeRemaining, setVipTimeRemaining] = React.useState<number>(0);
 
   useEffect(() => {
     if (user) {
@@ -68,7 +98,7 @@ const MainApp: React.FC = () => {
     }
   };
 
-  // Countdown timer for prediction (existing)
+  // Countdown timer for prediction
   useEffect(() => {
     let timer: any;
     if (status === AppStatus.PREDICTED && seconds > 0) {
@@ -81,36 +111,53 @@ const MainApp: React.FC = () => {
     return () => clearInterval(timer);
   }, [status, seconds]);
 
-  // Timer for VIP countdown (optional visual)
+  // Timer for VIP countdown & Dynamic Colors
   useEffect(() => {
     if (vipExpiry) {
       const interval = setInterval(() => {
-        if (new Date() > vipExpiry) {
+        const now = new Date().getTime();
+        const end = vipExpiry.getTime();
+        const diff = end - now;
+
+        setVipTimeRemaining(diff);
+
+        if (diff <= 0) {
           setIsVip(false);
           setVipExpiry(null);
-          // Force navigation or alert if needed
+          setStatus(AppStatus.IDLE);
         }
-      }, 5000);
+      }, 1000);
       return () => clearInterval(interval);
     }
   }, [vipExpiry]);
 
+  const getVipTimerColor = () => {
+    const minutesLeft = vipTimeRemaining / 60000;
+    if (minutesLeft > 10) return 'bg-green-100 text-green-700 border-green-200';
+    if (minutesLeft > 2) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+    return 'bg-red-100 text-red-700 border-red-200 animate-pulse';
+  };
+
+  const formatVipTime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m}m ${s}s`;
+  };
+
   const handlePredict = async () => {
     playClick();
     if (!isVip) {
-      // navigate('/vip');
-      alert(t('vipPrompt') || 'You need VIP access to use this feature.');
-      navigate('/vip');
+      setShowVipModal(true);
       return;
     }
 
     setStatus(AppStatus.LOADING);
-    // Simulate prediction (replace with real API if needed)
     setTimeout(() => {
       const randomMultiplier = (Math.random() * 10 + 1).toFixed(2);
       setMultiplier(parseFloat(randomMultiplier));
       setStatus(AppStatus.PREDICTED);
-      setSeconds(60); // 1 minute validity
+      setSeconds(60);
     }, 2000);
   };
 
@@ -118,80 +165,70 @@ const MainApp: React.FC = () => {
   if (!user) return <Login />;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans select-none" dir={dir}>
-      <Header
-        onProfileClick={() => navigate('/profile')}
-        onVipClick={() => navigate('/vip')}
-        onSettingsClick={() => navigate('/settings')}
-        onAboutClick={() => navigate('/about')}
-      />
+    <div className="flex-grow flex flex-col items-center justify-start pt-16 pb-12 px-4 md:px-6">
+      <section className="text-center space-y-2 mb-10" data-purpose="title-section">
+        <h1 className="text-6xl md:text-8xl font-black leading-none bg-gradient-to-r from-black via-gray-600 to-black bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto]">
+          1631
+        </h1>
+        <h2 className="text-2xl md:text-5xl font-black text-black tracking-tighter uppercase drop-shadow-sm">
+          {t('appTitle') || 'Aviator Crash Predictor'}
+        </h2>
 
-      <main className="flex-grow flex flex-col items-center justify-start pt-16 pb-12 px-4 md:px-6">
-        <section className="text-center space-y-2 mb-10" data-purpose="title-section">
-          <h1 className="text-6xl md:text-8xl font-black leading-none bg-gradient-to-r from-black via-gray-600 to-black bg-clip-text text-transparent animate-gradient-x bg-[length:200%_auto]">
-            1631
-          </h1>
-          <h2 className="text-2xl md:text-5xl font-black text-black tracking-tighter uppercase drop-shadow-sm">
-            {t('appTitle') || 'Aviator Crash Predictor'}
-          </h2>
+        {isVip && vipExpiry && (
+          <div className={`mt-4 px-6 py-2 rounded-full text-lg font-bold border inline-flex items-center gap-2 transition-colors duration-300 ${getVipTimerColor()}`}>
+            <Crown size={20} className="mb-0.5" />
+            VIP Active: {formatVipTime(vipTimeRemaining)}
+          </div>
+        )}
+      </section>
 
-          {isVip && vipExpiry && (
-            <div className="mt-4 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm font-bold border border-green-200 inline-block animate-pulse">
-              VIP Active: Ends in {Math.ceil((vipExpiry.getTime() - new Date().getTime()) / 60000)}m
-            </div>
-          )}
-        </section>
-
-        <div className="relative group" data-purpose="action-area">
-          {/* Primary Button */}
-          <button
-            onClick={handlePredict}
-            disabled={status === AppStatus.LOADING}
-            className={`
+      <div className="relative group" data-purpose="action-area">
+        <button
+          onClick={handlePredict}
+          disabled={status === AppStatus.LOADING}
+          className={`
                             text-3xl md:text-5xl font-black py-4 px-20 rounded-full border-[3px] shadow-neubrutalist 
                             transition-all duration-150 ease-in-out
                             ${isVip
-                ? 'bg-black text-white border-black hover:translate-y-1 hover:shadow-neubrutalist-sm active:translate-y-2 active:shadow-none'
-                : 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'}
+              ? 'bg-black text-white border-black hover:translate-y-1 hover:shadow-neubrutalist-sm active:translate-y-2 active:shadow-none'
+              : 'bg-gray-100 text-gray-400 border-gray-300'}
                             ${status === AppStatus.LOADING ? 'opacity-70 cursor-wait' : ''}
                         `}
-          >
-            {status === AppStatus.LOADING ? t('analyzing') : t('predict')}
-          </button>
+        >
+          {status === AppStatus.LOADING ? t('analyzing') : t('predict')}
+        </button>
 
-          {!isVip && (
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => navigate('/vip')}
-                className="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2 mx-auto"
-              >
-                <Crown size={20} className="text-white" />
-                {t('getVip') || 'Enable VIP Access'}
-              </button>
-              <p className="mt-2 text-sm text-gray-500 font-medium">VIP required for predictions</p>
-            </div>
-          )}
+        {!isVip && (
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate('/vip')}
+              className="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2 mx-auto"
+            >
+              <Crown size={20} className="text-white" />
+              {t('getVip') || 'Enable VIP Access'}
+            </button>
+            <p className="mt-2 text-sm text-gray-500 font-medium">VIP required for predictions</p>
+          </div>
+        )}
 
-          {status === AppStatus.EXPIRED && isVip && (
-            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-red-100 text-red-600 border-2 border-red-600 px-4 py-1 rounded-full text-sm font-bold animate-bounce hidden md:block">
-              {t('expired') || 'Expired! Try again'}
-            </div>
-          )}
-        </div>
+        {status === AppStatus.EXPIRED && isVip && (
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-red-100 text-red-600 border-2 border-red-600 px-4 py-1 rounded-full text-sm font-bold animate-bounce hidden md:block">
+            {t('expired') || 'Expired! Try again'}
+          </div>
+        )}
+      </div>
 
-        <PredictorCard
-          multiplier={multiplier}
-          seconds={seconds}
-          isLoading={status === AppStatus.LOADING}
-        />
+      <PredictorCard
+        multiplier={multiplier}
+        seconds={seconds}
+        isLoading={status === AppStatus.LOADING}
+      />
 
-
-        <div className="mt-auto pt-12 text-center text-gray-400 font-bold max-w-md">
-          <p className="text-sm">
-            {t('playResponsibly') || '1631 AI Predictor. Play Responsibly.'}
-          </p>
-        </div>
-      </main>
+      <div className="mt-auto pt-12 text-center text-gray-400 font-bold max-w-md">
+        <p className="text-sm">
+          {t('playResponsibly') || '1631 AI Predictor. Play Responsibly.'}
+        </p>
+      </div>
 
       {/* Decorations */}
       <div className="fixed bottom-4 left-4 hidden md:block opacity-20 transform rotate-12">
@@ -202,69 +239,50 @@ const MainApp: React.FC = () => {
       </div>
 
       <Notifications />
+      <VipAccessModal isOpen={showVipModal} onClose={() => setShowVipModal(false)} />
     </div>
   );
 };
 
 const App: React.FC = () => {
+  const { theme } = useTheme();
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
+    <Router>
+      <div className={clsx('min-h-screen bg-gray-50 flex flex-col font-sans transition-colors duration-200', theme === 'dark' ? 'dark bg-gray-900' : '')}>
+        <Header />
+        <main className="flex-1 container mx-auto px-4 py-8 max-w-md w-full relative z-10">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
+            <Route path="/" element={<HomeWrapper />} />
+            <Route path="/vip" element={<VIPWrapper />} />
+            <Route path="/profile" element={<ProfileWrapper />} />
+            <Route path="/about" element={<AboutWrapper />} />
+            <Route path="/settings" element={<Navigate to="/profile" replace />} />
 
-        {/* User Routes */}
-        <Route path="/" element={<MainApp />} />
-        <Route path="/profile" element={<ProfileWrapper />} />
-        <Route path="/vip" element={<VIPWrapper />} />
-        <Route path="/settings" element={<SettingsWrapper />} />
-        <Route path="/about" element={<AboutWrapper />} />
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="users" element={<UserList />} />
+              <Route path="vip" element={<VipManager />} />
+              <Route path="payments" element={<Payments />} />
+              <Route path="predictions" element={<Predictions />} />
+            </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminRoute />}>
-          <Route element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="users" element={<UserList />} />
-            <Route path="payments" element={<Payments />} />
-            <Route path="vip" element={<VipManager />} />
-            <Route path="logs" element={<Predictions />} />
-          </Route>
-        </Route>
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
-};
-
-// Wrappers to handle internal navigation logic of existing components
-const ProfileWrapper = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  if (!user) return <Login />;
-  return <Profile onBack={() => navigate('/')} />;
-};
-
-const VIPWrapper = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  if (!user) return <Login />;
-  return <VIP onBack={() => navigate('/')} />;
-};
-
-const SettingsWrapper = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  if (!user) return <Login />;
-  return <Settings onBack={() => navigate('/')} />;
-};
-
-const AboutWrapper = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  if (!user) return <Login />;
-  return <AboutUs onBack={() => navigate('/')} />;
 };
 
 export default App;

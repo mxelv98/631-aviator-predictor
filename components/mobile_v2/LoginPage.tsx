@@ -24,11 +24,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onGoogleLogin }) => {
         setIsLoading(true);
         setError(null);
 
-        // Visual effect: go through steps
+        // Progress effect
         for (let i = 0; i < steps.length; i++) {
             setStep(i);
-            // Smaller delay for better UX while keeping the effect
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 450));
         }
 
         try {

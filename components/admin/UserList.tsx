@@ -77,7 +77,7 @@ const UserList: React.FC = () => {
 
         if (error) {
             console.error(error);
-            alert('Failed to active VIP');
+            alert(`Failed to activate VIP: ${error.message} \nDetails: ${error.details || ''}`);
         } else {
             // Log action
             await supabase.from('admin_logs').insert({

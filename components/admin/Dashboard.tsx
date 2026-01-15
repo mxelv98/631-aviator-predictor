@@ -3,7 +3,8 @@ import { supabase } from '../../lib/supabase';
 import MetricsCard from './MetricsCard';
 import ActivityTable from './ActivityTable';
 import { MetricData, ActivityLog } from './types';
-import { Users, Crown, AlertTriangle, DollarSign } from 'lucide-react';
+import { Users, Crown, DollarSign } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
     const [metrics, setMetrics] = useState<MetricData[]>([]);
@@ -52,14 +53,10 @@ const Dashboard: React.FC = () => {
                     color: 'green',
                     icon: <DollarSign className="w-6 h-6 text-green-500" />
                 },
-                // Placeholder for expired/issues if needed
             ];
 
             setMetrics(newMetrics);
 
-            // Fetch recent logs (mocking for now if admin_logs table is empty or using users as activity)
-            // Ideally we fetch from 'admin_logs' table if created. 
-            // In my plan I created 'admin_logs'.
             const { data: logs } = await supabase
                 .from('admin_logs')
                 .select('*')
@@ -70,13 +67,12 @@ const Dashboard: React.FC = () => {
                 setActivities(logs.map(log => ({
                     id: log.id,
                     date: new Date(log.created_at).toLocaleString(),
-                    user: log.admin_id, // or fetch user email
+                    user: log.admin_id,
                     action: log.action,
                     details: JSON.stringify(log.details),
                     status: 'Completed'
                 })));
             } else {
-                // Fallback to show recent user signups as activity if logs empty
                 const { data: newUsers } = await supabase.from('users').select('*').order('created_at', { ascending: false }).limit(5);
                 setActivities(newUsers?.map(u => ({
                     id: u.id,
@@ -96,8 +92,15 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="p-10">
-            <header className="mb-8">
+            <header className="mb-8 flex justify-between items-center sm:flex-row flex-col gap-4">
                 <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+                <Link
+                    to="/admin/users"
+                    className="bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-all shadow-md flex items-center gap-2"
+                >
+                    <Users size={20} />
+                    Manage Users & VIP
+                </Link>
             </header>
 
             <section className="mb-10">

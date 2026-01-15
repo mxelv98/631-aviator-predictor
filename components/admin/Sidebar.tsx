@@ -60,8 +60,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
     return (
         <aside className={`
-            fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out
-            md:relative md:translate-x-0 flex flex-col h-full
+            fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 
+            transition-transform duration-300 ease-in-out
+            md:translate-x-0 md:static md:inset-auto md:flex flex-col h-full
             ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}>
             <div className="p-8 pb-4 flex justify-between items-center">

@@ -38,13 +38,7 @@ const Header: React.FC<HeaderProps> = ({ onProfileClick, onVipClick, onSettingsC
         >
           VIP
         </button>
-        <span className="opacity-30 mx-1 md:mx-2 select-none">|</span>
-        <button
-          onClick={() => handleNav(onProfileClick)}
-          className="hover:underline decoration-2 underline-offset-4 cursor-pointer"
-        >
-          {t('profile')}
-        </button>
+
         <span className="opacity-30 mx-1 md:mx-2 select-none">|</span>
         <button
           onClick={() => handleNav(onSettingsClick)}

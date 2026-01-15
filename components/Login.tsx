@@ -11,26 +11,36 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         playClick();
         setError('');
+        setSuccessMsg('');
         try {
             if (isLogin) {
                 await loginWithEmail(email, password);
             } else {
                 await signupWithEmail(email, password);
+                setSuccessMsg(t('checkEmail') || 'We sent you an email. Please check your inbox to verify your account.');
             }
         } catch (err: any) {
             console.error('Email auth error:', err);
-            setError(err.message || 'Operation failed. Please check your credentials.');
+            // Handle common Supabase errors
+            if (err.message.includes('already registered')) {
+                setError(t('emailInUse') || 'This email is already registered. Please login.');
+            } else {
+                setError(err.message || 'Operation failed. Please check your credentials.');
+            }
         }
     };
 
     const handleSwitch = () => {
         playClick();
         setIsLogin(!isLogin);
+        setError('');
+        setSuccessMsg('');
     };
 
     return (
@@ -42,6 +52,13 @@ const Login: React.FC = () => {
                 <h2 className="text-3xl font-black mb-6 text-black">
                     {isLogin ? t('login') : t('signUp')}
                 </h2>
+
+                {successMsg && (
+                    <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded" role="alert">
+                        <p className="font-bold">{t('success') || 'Success!'}</p>
+                        <p>{successMsg}</p>
+                    </div>
+                )}
 
                 {error && <p className="text-red-600 bg-red-100 p-2 rounded mb-4 font-bold border-2 border-red-200">{error}</p>}
 

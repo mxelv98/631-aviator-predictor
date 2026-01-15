@@ -1,16 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-    onAuthStateChanged,
-    User,
-    signInWithPopup,
-    signOut,
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
-} from 'firebase/auth';
-import { auth, googleProvider, facebookProvider } from '../lib/firebase';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
     user: User | null;
+    session: Session | null;
     loading: boolean;
     loginWithGoogle: () => Promise<void>;
     loginWithFacebook: () => Promise<void>;
@@ -21,62 +15,82 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+        // Check active sessions and sets the user
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setUser(session?.user ?? null);
             setLoading(false);
         });
-        return unsubscribe;
+
+        // Listen for changes on auth state (logged in, signed out, etc.)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+            setUser(session?.user ?? null);
+            setLoading(false);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const loginWithGoogle = async () => {
-        try {
-            await signInWithPopup(auth, googleProvider);
-        } catch (error) {
-            console.error("Google login failed", error);
-            throw error;
-        }
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin
+            }
+        });
+        if (error) throw error;
     };
 
     const loginWithFacebook = async () => {
-        try {
-            await signInWithPopup(auth, facebookProvider);
-        } catch (error) {
-            console.error("Facebook login failed", error);
-            throw error;
-        }
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'facebook',
+            options: {
+                redirectTo: window.location.origin
+            }
+        });
+        if (error) throw error;
     };
 
     const loginWithEmail = async (email: string, password: string) => {
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            console.error("Email login failed", error);
-            throw error;
-        }
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
+        if (error) throw error;
     };
 
     const signupWithEmail = async (email: string, password: string) => {
-        try {
-            await createUserWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-            console.error("Email signup failed", error);
-            throw error;
-        }
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                // You can add more user metadata here if needed
+                data: {
+                    full_name: email.split('@')[0], // Default name from email
+                },
+            },
+        });
+        if (error) throw error;
     };
 
     const logout = async () => {
-        await signOut(auth);
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
     };
 
     const value = {
         user,
+        session,
         loading,
         loginWithGoogle,
         loginWithFacebook,

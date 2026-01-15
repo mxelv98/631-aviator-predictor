@@ -76,6 +76,9 @@ export const translations: Record<Language, Record<string, string>> = {
         featureVipCommunity: 'Access to Exclusive VIP Community',
         featureDataProtection: 'Advanced Data Protection',
         featureAnalyticsDashboard: 'Custom Analytics Dashboard',
+        checkEmail: 'We sent you an email. Please check your inbox to verify your account.',
+        success: 'Success!',
+        emailInUse: 'This email is already registered. Please login.',
     },
 
     ar: {
@@ -135,6 +138,9 @@ export const translations: Record<Language, Record<string, string>> = {
         featureVipCommunity: 'الوصول إلى مجتمع VIP الحصري',
         featureDataProtection: 'حماية بيانات متقدمة',
         featureAnalyticsDashboard: 'لوحة تحكم مخصصة للتحليلات',
+        checkEmail: 'أرسلنا لك بريدًا إلكترونيًا. يرجى التحقق من صندوق الوارد لتفعيل حسابك.',
+        success: 'تم بنجاح!',
+        emailInUse: 'هذا البريد الإلكتروني مسجل بالفعل. الرجاء تسجيل الدخول.',
     },
     fr: {
         appTitle: 'Aviator Crash Predictor',
@@ -193,6 +199,9 @@ export const translations: Record<Language, Record<string, string>> = {
         featureVipCommunity: 'Access to Exclusive VIP Community',
         featureDataProtection: 'Advanced Data Protection',
         featureAnalyticsDashboard: 'Custom Analytics Dashboard',
+        checkEmail: 'Nous vous avons envoyé un e-mail. Veuillez vérifier votre boîte de réception pour vérifier votre compte.',
+        success: 'Succès!',
+        emailInUse: 'Cet e-mail est déjà enregistré. Veuillez vous connecter.',
     },
     zh: {
         appTitle: '飞行员崩溃预测器',

@@ -27,7 +27,7 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
         }
     };
 
-    const numericId = user ? getNumericId(user.uid) : '00000000';
+    const numericId = user ? getNumericId(user.id) : '00000000';
     const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : t('unknownInitials');
 
     return (
@@ -35,14 +35,14 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
             <div className="w-full border-[3px] border-black p-8 shadow-neubrutalist rounded-2xl bg-white relative">
                 <div className="flex flex-col items-center mb-8 pb-8 border-b-2 border-black">
                     <div className="w-24 h-24 rounded-full border-[3px] border-black mb-4 overflow-hidden bg-gray-100 flex items-center justify-center shadow-neubrutalist-sm">
-                        {user?.photoURL ? (
-                            <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                        {user?.user_metadata?.avatar_url ? (
+                            <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
                             <span className="text-3xl font-black text-gray-400">{userInitials}</span>
                         )}
                     </div>
                     <h2 className="text-2xl font-black uppercase tracking-tighter text-center">
-                        {user?.displayName || t('userProfile')}
+                        {user?.user_metadata?.full_name || t('userProfile')}
                     </h2>
                 </div>
 

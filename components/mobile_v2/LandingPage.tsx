@@ -64,8 +64,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
 
                 {/* Hero Section */}
                 <div className="mb-14 space-y-4">
-                    <h1 className="text-6xl font-black tracking-tighter text-white leading-[0.85] uppercase italic">
-                        {t.hero.split(' ')[0]} <br /><span className="text-brand-primary">{t.hero.split(' ')[1]}</span>
+                    <h1 className="text-6xl font-black tracking-tighter text-white leading-[0.85] uppercase italic" style={{ color: '#ffffff' }}>
+                        {t.hero.split(' ')[0]} <br /><span className="text-brand-primary" style={{ color: '#0ea5e9' }}>{t.hero.split(' ')[1]}</span>
                     </h1>
                     <p className="text-slate-500 text-sm font-bold uppercase tracking-widest leading-relaxed max-w-[280px]">
                         {t.sub}

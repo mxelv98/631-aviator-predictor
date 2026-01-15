@@ -24,4 +24,27 @@ body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
+    background-color: #000000;
+    /* Fallback */
+    color: #ffffff;
+    /* Fallback */
+}
+
+/* Force headings to white */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #ffffff;
+}
+
+/* Force inputs to have visible text/bg */
+input,
+textarea,
+select {
+    color: #ffffff;
+    background-color: #1e293b;
+    /* slate-800 */
 }

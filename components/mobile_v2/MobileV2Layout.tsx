@@ -230,7 +230,7 @@ const MobileV2Layout: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex justify-center bg-[#000000] sm:p-6 font-sans" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen flex justify-center bg-[#000000] sm:p-6 font-sans" dir={isRTL ? 'rtl' : 'ltr'} style={{ backgroundColor: '#000000', color: '#ffffff' }}>
             <div className="w-full max-w-[480px] bg-brand-bg min-h-[100dvh] sm:min-h-0 sm:h-[840px] relative overflow-hidden flex flex-col sm:rounded-[40px] sm:shadow-2xl sm:border border-brand-border">
                 {renderPage()}
             </div>

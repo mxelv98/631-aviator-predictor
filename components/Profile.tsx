@@ -1,4 +1,23 @@
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { supabase } from '../lib/supabase';
+import { languages } from '../lib/translations';
+import { Crown, Moon, Bell, Globe, LogOut, ArrowLeft, Loader2 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+
+interface ProfileProps {
+    onBack: () => void;
+}
+
+const getNumericId = (uid: string): string => {
+    let hash = 0;
+    for (let i = 0; i < uid.length; i++) {
+        hash = ((hash << 5) - hash) + uid.charCodeAt(i);
+        hash |= 0; // Ensure 32-bit integer
+    }
+    return Math.abs(hash).toString().substring(0, 8);
+};
 
 const Profile: React.FC<ProfileProps> = ({ onBack }) => {
     const { user, logout } = useAuth();
@@ -74,19 +93,8 @@ const Profile: React.FC<ProfileProps> = ({ onBack }) => {
         if (user) {
             await supabase.from('user_settings').upsert({
                 user_id: user.id,
-                // dark_mode is handled by ThemeContext now, but we need to preserve it if we update here. 
-                // However, user_settings table probably has independent columns.
-                // Ideally, we should only update notifications here.
                 notifications_enabled: newValue
             });
-        }
-    };
-
-    const toggleNotifications = async () => {
-        const newValue = !notifications;
-        setNotifications(newValue);
-        if (user) {
-            await supabase.from('user_settings').upsert({ user_id: user.id, dark_mode: darkMode, notifications_enabled: newValue });
         }
     };
 

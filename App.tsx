@@ -247,15 +247,24 @@ const MainApp: React.FC = () => {
 const AppContent: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const hideHeaderRoutes = ['/login', '/signup', '/forgot-password', '/update-password'];
+  const isAuthPage = hideHeaderRoutes.includes(location.pathname);
+  const isAdminPage = location.pathname.startsWith('/admin');
+
+  const shouldShowHeader = !isAuthPage && !isAdminPage;
 
   return (
     <div className={clsx('min-h-screen bg-gray-50 flex flex-col font-sans transition-colors duration-200', theme === 'dark' ? 'dark bg-gray-900' : '')}>
-      <Header
-        onProfileClick={() => navigate('/profile')}
-        onVipClick={() => navigate('/vip')}
-        onSettingsClick={() => navigate('/settings')}
-        onAboutClick={() => navigate('/about')}
-      />
+      {shouldShowHeader && (
+        <Header
+          onProfileClick={() => navigate('/profile')}
+          onVipClick={() => navigate('/vip')}
+          onSettingsClick={() => navigate('/settings')}
+          onAboutClick={() => navigate('/about')}
+        />
+      )}
       <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl w-full relative z-10">
         <Routes>
           <Route path="/login" element={<Login />} />

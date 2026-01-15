@@ -68,7 +68,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onGoogleLogin }) => {
                 </div>
 
                 {isLoading ? (
-                    <div className="space-y-10 py-10 animate-in fade-in duration-500">
+                    <div className="space-y-10 py-10">
                         <div className="flex flex-col items-center">
                             <div className="relative">
                                 <div className="w-20 h-20 border-2 border-brand-primary/10 rounded-full"></div>
@@ -86,7 +86,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onGoogleLogin }) => {
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-10 animate-in slide-in-from-bottom-6 duration-700">
+                    <div className="space-y-10">
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div className="group">
                                 <label className="block text-[10px] font-black text-slate-600 uppercase tracking-widest mb-2 ml-1 group-focus-within:text-brand-primary transition-colors">Operator Credentials</label>

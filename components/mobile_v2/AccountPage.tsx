@@ -124,7 +124,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ user, onBack, onUpgradeV3, on
                     </button>
 
                     {showLangMenu && (
-                        <div className="mt-3 bg-slate-950 border border-white/5 rounded-[24px] overflow-hidden shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200 grid grid-cols-2 gap-1 p-2">
+                        <div className="mt-3 bg-slate-950 border border-white/5 rounded-[24px] overflow-hidden shadow-2xl grid grid-cols-2 gap-1 p-2">
                             {LANGUAGES.map((langItem) => (
                                 <button
                                     key={langItem}

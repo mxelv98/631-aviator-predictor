@@ -52,7 +52,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
                 <div className="absolute top-0 right-0 w-64 h-64 bg-brand-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
 
                 {/* Logo Section */}
-                <div className="mb-14 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
+                <div className="mb-14 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center font-black text-white text-xl shadow-lg shadow-brand-primary/20 italic">
                         1
                     </div>
@@ -63,7 +63,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
                 </div>
 
                 {/* Hero Section */}
-                <div className="mb-14 space-y-4 animate-in fade-in duration-1000 delay-100">
+                <div className="mb-14 space-y-4">
                     <h1 className="text-6xl font-black tracking-tighter text-white leading-[0.85] uppercase italic">
                         {t.hero.split(' ')[0]} <br /><span className="text-brand-primary">{t.hero.split(' ')[1]}</span>
                     </h1>

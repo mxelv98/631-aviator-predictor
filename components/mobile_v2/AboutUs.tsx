@@ -44,7 +44,7 @@ const AboutUs: React.FC<AboutUsProps> = ({ user, onBack }) => {
                 <span className="font-black text-sm uppercase tracking-[0.2em]">{lang.title}</span>
             </header>
 
-            <div className="p-8 space-y-10 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="p-8 space-y-10 pb-20">
                 <div className="flex flex-col items-center mb-4">
                     <div className="w-20 h-20 rounded-3xl bg-brand-primary flex items-center justify-center font-black text-white text-4xl shadow-2xl shadow-brand-primary/20 italic mb-6">
                         1

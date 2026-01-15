@@ -132,7 +132,7 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
             <main className="flex-1 overflow-y-auto hide-scrollbar p-6 space-y-6 pb-24 relative z-10">
 
                 {/* NETWORK METRICS */}
-                <div className="grid grid-cols-3 gap-3 animate-in fade-in duration-700">
+                <div className="grid grid-cols-3 gap-3">
                     <MetricBox label="LATENCY" value={`${metrics.latency}ms`} color={brandColor} />
                     <MetricBox label="LOAD" value={`${metrics.load}%`} color={brandColor} />
                     <MetricBox label="SYNC" value={`${metrics.sync}%`} color={brandColor} />
@@ -169,7 +169,7 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
                 {/* MAIN ENGINE TERMINAL */}
                 <section className={`min-h-[340px] rounded-[48px] p-8 border relative overflow-hidden flex flex-col items-center justify-center transition-all duration-1000 ${isElite ? 'bg-brand-elite/5 border-brand-elite/30 elite-glow' : 'bg-slate-900/20 border-white/10'}`}>
                     {isFreeV3LimitReached ? (
-                        <div className="flex flex-col items-center text-center animate-in zoom-in duration-500 max-w-[280px]">
+                        <div className="flex flex-col items-center text-center max-w-[280px]">
                             <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-8 relative">
                                 <div className="absolute inset-0 rounded-full border border-red-500/30 animate-ping opacity-20"></div>
                                 <svg className="text-red-500" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -191,7 +191,7 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
                     ) : (
                         <div className="w-full flex flex-col items-center">
                             {isAnalyzing ? (
-                                <div className="flex flex-col items-center w-full animate-in zoom-in duration-500">
+                                <div className="flex flex-col items-center w-full">
                                     <div className="relative mb-10">
                                         <div className={`text-8xl font-black italic tracking-tighter ${isElite ? 'text-brand-elite' : 'text-white'}`}>
                                             {Math.floor(analysisProgress)}<span className="text-3xl">%</span>
@@ -203,7 +203,7 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
                                     <p className={`mt-6 text-[10px] font-black uppercase tracking-[0.4em] animate-pulse ${isElite ? 'text-brand-elite' : 'text-brand-primary'}`}>Kernel Scanning Clusters</p>
                                 </div>
                             ) : currentSignal ? (
-                                <div className="animate-in zoom-in duration-700 flex flex-col items-center w-full">
+                                <div className="flex flex-col items-center w-full">
                                     <span className={`text-[10px] font-black uppercase tracking-[0.4em] mb-6 ${isElite ? 'text-brand-elite' : 'text-slate-500'}`}>Target Sequence Confirmed</span>
                                     <div className="relative group">
                                         {isElite && <div className="absolute -inset-10 bg-brand-elite/10 blur-[80px] rounded-full animate-pulse"></div>}
@@ -226,7 +226,7 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
                                     </div>
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center animate-in fade-in duration-1000">
+                                <div className="flex flex-col items-center">
                                     <div className={`w-32 h-32 rounded-full border flex items-center justify-center mb-10 relative group ${isElite ? 'border-brand-elite/20 bg-brand-elite/5' : 'border-white/5 bg-white/[0.01]'}`}>
                                         <div className={`absolute inset-0 rounded-full border-t-2 animate-spin duration-[2s] ${isElite ? 'border-brand-elite' : 'border-brand-primary'}`}></div>
                                         <svg className={`opacity-20 ${isElite ? 'text-brand-elite' : 'text-white'}`} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>

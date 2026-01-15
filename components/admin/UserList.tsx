@@ -141,8 +141,8 @@ const UserList: React.FC = () => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                <table className="w-full text-left">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+                <table className="w-full text-left min-w-[800px]">
                     <thead className="bg-gray-50 border-b border-gray-100">
                         <tr>
                             <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
@@ -225,10 +225,11 @@ const UserList: React.FC = () => {
                                                 </button>
                                                 <button
                                                     onClick={() => handleGiveVip(user.id)}
-                                                    className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-md transition-all"
-                                                    title="Give VIP (30m)"
+                                                    className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-md transition-all font-bold text-xs border border-amber-200"
+                                                    title="Give 30m VIP"
                                                 >
-                                                    <Sparkles size={16} />
+                                                    <Sparkles size={14} />
+                                                    <span>Give VIP 30m</span>
                                                 </button>
                                                 <div className="h-4 w-px bg-gray-200 mx-1"></div>
                                                 <button

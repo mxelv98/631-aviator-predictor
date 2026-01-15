@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const Predictions: React.FC = () => {
   const [insight, setInsight] = useState<string | null>(null);
@@ -9,19 +9,21 @@ const Predictions: React.FC = () => {
   const generatePredictions = async () => {
     setLoading(true);
     try {
-      // Initialize GoogleGenAI using Vite env var
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+      // Initialize GoogleGenerativeAI using Vite env var (consistent with geminiService)
+      const apiKey = import.meta.env.VITE_GOOGLE_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || '';
       if (!apiKey) throw new Error('API Key missing');
 
-      const ai = new GoogleGenAI({ apiKey });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: "Analyze these mock admin stats: 25k users, 1.2k VIPs, $145k total payments. Provide a short, 3-point strategic prediction for next month in French, as this is for a French-speaking admin.",
-        config: {
-          systemInstruction: "Tu es un analyste de données expert pour une plateforme SaaS. Tes prédictions doivent être concises et orientées business.",
-        }
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        systemInstruction: "Tu es un analyste de données expert pour une plateforme SaaS. Tes prédictions doivent être concises et orientées business."
       });
-      setInsight(response.text || "Aucune prédiction disponible.");
+
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: "Analyze these mock admin stats: 25k users, 1.2k VIPs, $145k total payments. Provide a short, 3-point strategic prediction for next month in French, as this is for a French-speaking admin." }] }]
+      });
+
+      setInsight(result.response.text() || "Aucune prédiction disponible.");
     } catch (error) {
       console.error("AI Error:", error);
       setInsight("Erreur lors de la génération des prédictions. Veuillez vérifier votre clé API.");

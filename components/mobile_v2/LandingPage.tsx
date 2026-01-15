@@ -65,10 +65,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
 
                 {/* Hero Section */}
                 <div className="mb-14 space-y-4 animate-in fade-in duration-1000 delay-100 w-full">
-                    <h1 className="text-6xl font-black tracking-tighter text-white leading-[0.85] uppercase italic">
-                        {t.hero.split(' ')[0]} <br /><span className="text-brand-primary">{t.hero.split(' ')[1]}</span>
+                    <h1 className="text-6xl font-black tracking-tighter text-white leading-[0.85] uppercase">
+                        PRECISION<br />CONTROL.
                     </h1>
-                    <p className="text-slate-500 text-sm font-bold uppercase tracking-widest leading-relaxed max-w-[280px]">
+                    <p className="text-brand-primary text-xs font-black uppercase tracking-widest leading-relaxed max-w-[320px]">
                         {t.sub}
                     </p>
                 </div>
@@ -76,39 +76,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ user, onUpgradeV3, onUpgradeV
                 {/* Tier Cards */}
                 <div className="space-y-4 mb-14 w-full">
                     {/* 3v Card */}
-                    <div className={`group p-6 rounded-[32px] border transition-all duration-500 ${!user.isVip ? 'border-brand-primary/30 bg-brand-primary/5 pro-shadow' : 'border-white/5 opacity-40 grayscale'}`}>
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] font-black text-brand-primary uppercase tracking-widest italic">Core v3.2</span>
+                    <div className={`group p-8 rounded-[36px] border transition-all duration-500 bg-[#0a0a0a] ${!user.isVip ? 'border-brand-primary/30 pro-shadow' : 'border-white/5 opacity-40 grayscale'}`}>
+                        <div className="flex justify-between items-start mb-4">
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Core v3.2</span>
                             {!user.isV3Paid && !user.isVip && (
                                 <div className="bg-brand-primary text-white text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest">{t.free}</div>
                             )}
                         </div>
-                        <h3 className="text-xl font-black text-white italic mb-1 uppercase">{t.v3}</h3>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">{t.v3Details}</p>
+                        <h3 className="text-2xl font-black text-white italic mb-1 uppercase tracking-tight">{t.v3}</h3>
+                        <p className="text-[10px] text-slate-600 font-bold uppercase tracking-tight">{t.v3Details}</p>
                     </div>
 
                     {/* 6v Elite Card */}
                     <div
-                        className={`group p-8 rounded-[36px] border transition-all duration-700 relative overflow-hidden ${user.isVip ? 'border-brand-elite bg-brand-elite/10 elite-glow' : 'border-white/10 bg-white/[0.02] hover:border-brand-elite/30'}`}
+                        className={`group p-8 rounded-[36px] border transition-all duration-700 relative overflow-hidden bg-[#0a0a0a] ${user.isVip ? 'border-brand-elite/50 elite-glow' : 'border-white/10 hover:border-brand-elite/30'}`}
                     >
-                        <div className="absolute top-0 right-0 p-4">
-                            <div className={`w-3 h-3 rounded-full ${user.isVip ? 'bg-brand-elite animate-ping' : 'bg-slate-800'}`}></div>
-                        </div>
-
                         <div className="relative z-10">
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-[10px] font-black text-brand-elite uppercase tracking-[0.3em] italic">Elite v6.8</span>
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Elite v6.8</span>
                                 <span className="px-2 py-0.5 bg-brand-elite/10 text-brand-elite text-[7px] font-black rounded uppercase border border-brand-elite/20">Hyper-Sync</span>
                             </div>
-                            <h3 className="text-2xl font-black text-white italic mb-2 uppercase">{t.v6}</h3>
-                            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-tighter leading-none mb-6">
+                            <h3 className="text-2xl font-black text-white italic mb-2 uppercase tracking-tight">{t.v6}</h3>
+                            <p className="text-[11px] text-slate-600 font-bold uppercase tracking-tighter leading-none mb-6">
                                 {t.v6Details}
                             </p>
 
                             {!user.isVip && (
                                 <button
                                     onClick={onUpgradeV6}
-                                    className="w-full py-4 bg-brand-elite text-black font-black text-[10px] uppercase tracking-[0.3em] rounded-2xl shadow-xl shadow-brand-elite/20 transition-all hover:scale-[1.02] active:scale-95"
+                                    className="w-full py-5 bg-brand-elite text-black font-black text-[11px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-brand-elite/20 transition-all hover:scale-[1.02] active:scale-95"
                                 >
                                     {t.activate}
                                 </button>

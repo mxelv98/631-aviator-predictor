@@ -103,30 +103,30 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
             {/* Visual background layers */}
             <div className={`absolute inset-0 pointer-events-none opacity-[0.05] ${isElite ? 'bg-[radial-gradient(circle_at_50%_0%,#f59e0b_0%,transparent_50%)]' : 'bg-[radial-gradient(circle_at_50%_0%,#0ea5e9_0%,transparent_50%)]'}`}></div>
 
-            <header className={`px-6 py-5 flex items-center justify-between border-b backdrop-blur-2xl z-50 transition-colors ${isElite ? 'border-brand-elite/20 bg-brand-elite/5' : 'border-white/5 bg-slate-900/40'}`}>
+            <header className={`px-6 py-4 flex items-center justify-between border-b backdrop-blur-xl z-50 transition-colors ${isElite ? 'border-brand-elite/20 bg-brand-elite/5' : 'border-white/5 bg-[#0a0f1d]/90'}`}>
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-xl text-slate-400 hover:text-white transition-all">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                    <button onClick={onBack} className="p-2 -ml-2 text-slate-400 hover:text-white transition-all">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                     </button>
-                    <div>
-                        <h1 className="text-xl font-black italic tracking-tighter text-white">1631 <span className={isElite ? 'text-brand-elite' : 'text-brand-primary'}>{user.version.split(' ')[1]}</span></h1>
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-1.5">
-                                <span className={`w-1 h-1 rounded-full animate-pulse ${isElite ? 'bg-brand-elite' : 'bg-brand-primary'}`}></span>
-                                <span className="text-[7px] font-black text-slate-600 uppercase tracking-[0.4em]">Live Kernel authorized</span>
-                            </div>
+                    <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                            <h1 className="text-xl font-black italic tracking-tighter text-white">1631<span className={isElite ? 'text-brand-elite' : 'text-brand-primary'}> {user.version.split(' ')[1]}</span></h1>
                             {timeLeft && (
-                                <span className={`text-[10px] font-mono mt-1 font-black ${isElite ? 'text-brand-elite' : 'text-brand-primary'}`}>ID: {timeLeft}</span>
+                                <span className={`text-[10px] font-mono font-black ${isElite ? 'text-brand-elite' : 'text-brand-primary'}`}>{timeLeft}</span>
                             )}
+                        </div>
+                        <div className="flex items-center gap-1.5 -mt-1">
+                            <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isElite ? 'bg-brand-elite' : 'bg-brand-primary'}`}></span>
+                            <span className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">LIVE KERNEL AUTHORIZED</span>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button onClick={onOpenChat} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:border-brand-primary transition-all">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" /></svg>
+                <div className="flex items-center gap-2">
+                    <button onClick={onOpenChat} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:border-brand-primary/50 transition-all">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                     </button>
-                    <button onClick={onOpenAccount} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:border-brand-primary transition-all">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                    <button onClick={onOpenAccount} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:border-brand-primary/50 transition-all">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                     </button>
                 </div>
             </header>
@@ -169,7 +169,7 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
                 </section>
 
                 {/* MAIN ENGINE TERMINAL */}
-                <section className={`min-h-[340px] rounded-[48px] p-8 border relative overflow-hidden flex flex-col items-center justify-center transition-all duration-1000 ${isElite ? 'bg-brand-elite/5 border-brand-elite/30 elite-glow' : 'bg-slate-900/20 border-white/10'}`}>
+                <section className={`min-h-[380px] rounded-[48px] p-8 border relative overflow-hidden flex flex-col items-center justify-center transition-all duration-1000 ${isElite ? 'bg-brand-elite/5 border-brand-elite/30 elite-glow' : 'bg-slate-900/10 border-white/5 shadow-inner'}`}>
                     {isFreeV3LimitReached ? (
                         <div className="flex flex-col items-center text-center animate-in zoom-in duration-500 max-w-[280px]">
                             <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-8 relative">
@@ -229,28 +229,31 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center animate-in fade-in duration-1000">
-                                    <div className={`w-32 h-32 rounded-full border flex items-center justify-center mb-10 relative group ${isElite ? 'border-brand-elite/20 bg-brand-elite/5' : 'border-white/5 bg-white/[0.01]'}`}>
+                                    <div className={`w-36 h-36 rounded-full border flex items-center justify-center mb-10 relative group ${isElite ? 'border-brand-elite/20 bg-brand-elite/5' : 'border-white/5 bg-white/[0.01]'}`}>
                                         <div className={`absolute inset-0 rounded-full border-t-2 animate-spin duration-[2s] ${isElite ? 'border-brand-elite' : 'border-brand-primary'}`}></div>
-                                        <svg className={`opacity-20 ${isElite ? 'text-brand-elite' : 'text-white'}`} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
+                                        <div className="bg-slate-950/20 w-24 h-24 rounded-full flex items-center justify-center border border-white/5">
+                                            <svg className={`opacity-40 ${isElite ? 'text-brand-elite' : 'text-white/60'}`} width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                                        </div>
                                     </div>
-                                    <h3 className="text-base font-black text-white uppercase tracking-[0.4em] italic mb-2">Awaiting deployment</h3>
-                                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest text-center max-w-[200px]">Synchronize version {user.version.split(' ')[1]} with market node</p>
+                                    <h3 className="text-xl font-black text-white italic uppercase tracking-[0.2em] mb-2">Awaiting deployment</h3>
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest text-center max-w-[200px]">Synchronize version {user.version.split(' ')[1]} with market node</p>
                                 </div>
                             )}
 
                             <button
                                 onClick={runAnalysis}
                                 disabled={isAnalyzing}
-                                className={`mt-12 w-full max-w-[320px] py-7 rounded-[40px] font-black text-xs uppercase tracking-[0.5em] transition-all relative overflow-hidden flex items-center justify-center gap-4 group
-                   ${isAnalyzing
+                                className={`mt-12 w-full max-w-[320px] py-6 shadow-2xl rounded-[40px] font-black text-xs uppercase tracking-[0.3em] transition-all relative overflow-hidden flex items-center justify-center gap-4 group
+                    ${isAnalyzing
                                         ? 'bg-slate-900 text-slate-700 border border-white/5 opacity-50'
                                         : isElite
-                                            ? 'bg-brand-elite text-black shadow-xl shadow-brand-elite/30 hover:scale-[1.02]'
-                                            : 'bg-white text-black hover:bg-brand-primary hover:text-white shadow-xl'
+                                            ? 'bg-brand-elite text-black hover:scale-[1.02]'
+                                            : 'bg-white text-black hover:scale-[1.02]'
                                     }`}
                             >
-                                {isAnalyzing ? "Processing..." : "Deploy Signal"}
-                                {!isAnalyzing && <svg className="group-hover:translate-x-2 transition-transform" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M5 12h14M12 5l7 7-7 7" /></svg>}
+                                <span className="relative z-10">{isAnalyzing ? "Processing..." : "Deploy Signal"}</span>
+                                {!isAnalyzing && <svg className="relative z-10 group-hover:translate-x-2 transition-transform" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M5 12h14M12 5l7 7-7 7" /></svg>}
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                             </button>
                         </div>
                     )}
@@ -275,11 +278,11 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
 
             {/* PRO NAV BAR */}
             <nav className="fixed bottom-0 left-0 right-0 p-6 z-[60] flex justify-center pointer-events-none">
-                <div className={`w-full max-w-[360px] h-16 rounded-[28px] border backdrop-blur-3xl p-1 flex justify-around items-center pointer-events-auto shadow-2xl ${isElite ? 'bg-brand-elite/5 border-brand-elite/20' : 'bg-slate-950/80 border-white/10'}`}>
+                <div className={`w-full max-w-[400px] h-16 rounded-full border backdrop-blur-3xl p-1 flex justify-around items-center pointer-events-auto shadow-2xl ${isElite ? 'bg-brand-elite/10 border-brand-elite/20' : 'bg-slate-950/90 border-white/10'}`}>
                     <NavButton label="SCAN" active brandColor={brandColor} />
-                    <div className="w-[1px] h-6 bg-white/5"></div>
+                    <div className="w-[px] h-4 bg-white/5"></div>
                     <NavButton label="NETWORK" brandColor={brandColor} />
-                    <div className="w-[1px] h-6 bg-white/5"></div>
+                    <div className="w-[px] h-4 bg-white/5"></div>
                     <NavButton label="SECURE" brandColor={brandColor} />
                 </div>
             </nav>

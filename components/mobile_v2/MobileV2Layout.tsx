@@ -6,6 +6,7 @@ import AiChat from './AiChat';
 import AccountPage from './AccountPage';
 import LoginPage from './LoginPage';
 import AboutUs from './AboutUs';
+import SubscriptionPage from './SubscriptionPage';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 
@@ -29,7 +30,7 @@ const MobileV2Layout: React.FC = () => {
 
         const syncUserData = async () => {
             // Check VIP status
-            const { data: vipData } = await supabase
+            const { data: vipData, error } = await supabase
                 .from('vip_subscriptions')
                 .select('*')
                 .eq('user_id', authUser.id)
@@ -38,6 +39,10 @@ const MobileV2Layout: React.FC = () => {
                 .maybeSingle();
 
             const isVip = !!vipData;
+            // Access plan_type safely (even if TS complains about column existence without generated types)
+            const planType = (vipData as any)?.plan_type || 'core_v3';
+            const isElite = isVip && planType === 'elite_v6';
+
             // Basic scans count tracking via local storage for now
             const scansCount = parseInt(localStorage.getItem('aviator_scans_count') || '0', 10);
             const language = localStorage.getItem('aviator_language') || 'English';
@@ -49,8 +54,10 @@ const MobileV2Layout: React.FC = () => {
                 isVip: isVip,
                 isV3Paid: isVip, // Assuming active VIP grants access to paid features
                 scansCount: scansCount,
-                version: isVip ? '1631 6v' : '1631 3v',
-                language: language
+                version: isElite ? '1631 6v' : '1631 3v',
+                language: language,
+                vipExpiry: vipData?.end_time,
+                planType: planType
             };
 
             setUser(newUser);
@@ -79,14 +86,17 @@ const MobileV2Layout: React.FC = () => {
     };
 
     const handleUpgradeV3 = () => {
-        // Redirect to VIP page or handle upgrade logic
-        // For now, maybe just open the VIP modal or navigate?
-        // In the original app, it navigates to /vip
-        // This acts as a placeholder or can link to the main app's payment flow
-        window.location.href = '/vip'; // Simple redirect to existing payment flow
+        setCurrentPage(AppState.SUBSCRIPTION);
     };
 
     const handleUpgradeV6 = () => {
+        setCurrentPage(AppState.SUBSCRIPTION);
+    };
+
+    const handleSelectPlan = (plan: 'core_v3' | 'elite_v6') => {
+        // Redirect to Pay Page as requested
+        // For now, redirect to /vip which is the payment flow container
+        // If we had separate links, we'd use them.
         window.location.href = '/vip';
     };
 
@@ -115,6 +125,14 @@ const MobileV2Layout: React.FC = () => {
         switch (currentPage) {
             case AppState.LOGIN:
                 return <LoginPage onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />;
+            case AppState.SUBSCRIPTION:
+                return user ? (
+                    <SubscriptionPage
+                        user={user}
+                        onSelectPlan={handleSelectPlan}
+                        onBack={() => setCurrentPage(AppState.LANDING)}
+                    />
+                ) : null;
             case AppState.LANDING:
                 return user ? (
                     <LandingPage

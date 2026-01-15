@@ -21,10 +21,30 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
     const [currentSignal, setCurrentSignal] = useState<AiSignal | null>(null);
     const [metrics, setMetrics] = useState({ latency: 12, load: 42, sync: 98 });
     const [logs, setLogs] = useState<string[]>([`KERNEL_AUTH: V${user.version.split(' ')[1]} session established.`, "NETWORK_STATE: High Reliability."]);
+    const [timeLeft, setTimeLeft] = useState<string>('');
 
     const isElite = user.version === '1631 6v';
     const brandColor = isElite ? '#f59e0b' : '#0ea5e9';
     const isFreeV3LimitReached = !isElite && !user.isV3Paid && user.scansCount >= 2;
+
+    // Timer Logic
+    useEffect(() => {
+        if (!user.vipExpiry) return;
+        const interval = setInterval(() => {
+            const end = new Date(user.vipExpiry!).getTime();
+            const now = Date.now();
+            const diff = end - now;
+            if (diff <= 0) {
+                setTimeLeft('00:00:00');
+            } else {
+                const h = Math.floor(diff / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                setTimeLeft(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`);
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [user.vipExpiry]);
 
     // Real-time metric fluctuation
     useEffect(() => {
@@ -49,6 +69,7 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
     }, []);
 
     const runAnalysis = async () => {
+        // ... (keep existing runAnalysis)
         if (isAnalyzing || isFreeV3LimitReached) return;
         setIsAnalyzing(true);
         setAnalysisProgress(0);
@@ -89,9 +110,14 @@ const VipDashboard: React.FC<VipDashboardProps> = ({ user, onScanPerformed, onUp
                     </button>
                     <div>
                         <h1 className="text-xl font-black italic tracking-tighter text-white">1631 <span className={isElite ? 'text-brand-elite' : 'text-brand-primary'}>{user.version.split(' ')[1]}</span></h1>
-                        <div className="flex items-center gap-1.5">
-                            <span className={`w-1 h-1 rounded-full animate-pulse ${isElite ? 'bg-brand-elite' : 'bg-brand-primary'}`}></span>
-                            <span className="text-[7px] font-black text-slate-600 uppercase tracking-[0.4em]">Live Kernel authorized</span>
+                        <div className="flex flex-col">
+                            <div className="flex items-center gap-1.5">
+                                <span className={`w-1 h-1 rounded-full animate-pulse ${isElite ? 'bg-brand-elite' : 'bg-brand-primary'}`}></span>
+                                <span className="text-[7px] font-black text-slate-600 uppercase tracking-[0.4em]">Live Kernel authorized</span>
+                            </div>
+                            {timeLeft && (
+                                <span className={`text-[10px] font-mono mt-1 font-black ${isElite ? 'text-brand-elite' : 'text-brand-primary'}`}>ID: {timeLeft}</span>
+                            )}
                         </div>
                     </div>
                 </div>

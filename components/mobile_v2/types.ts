@@ -19,8 +19,10 @@ export interface User {
     isVip: boolean; // This represents 6v Elite status
     isV3Paid: boolean; // This represents paid 3v access ($56/3d)
     scansCount: number;
-    version: '1631 3v' | '1631 6v';
+    version: string;
     language: string;
+    vipExpiry?: string;
+    planType?: 'elite_v6' | 'core_v3';
 }
 
 export enum AppState {
@@ -29,5 +31,6 @@ export enum AppState {
     VIP_DASHBOARD = 'VIP_DASHBOARD',
     AI_CHAT = 'AI_CHAT',
     ACCOUNT = 'ACCOUNT',
-    ABOUT = 'ABOUT'
+    ABOUT = 'ABOUT',
+    SUBSCRIPTION = 'SUBSCRIPTION'
 }
